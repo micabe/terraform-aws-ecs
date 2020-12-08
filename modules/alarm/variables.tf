@@ -46,3 +46,4 @@ variable "policy_arn" {
   description = "The ARM of policy to execute when this alarm transitions into an ALARM state from any other state."
   default     = ""
 }
+

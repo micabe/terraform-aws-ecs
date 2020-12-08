@@ -61,3 +61,4 @@ variable "scale_in_threshold" {
   description = "The value against which the specified statistic is compared for scaling in alarm."
   default     = 15
 }
+

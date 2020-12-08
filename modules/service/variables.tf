@@ -53,13 +53,13 @@ variable "alb_protocol" {
 }
 
 variable "alb_subnets" {
-  type        = "list"
+  type        = list(string)
   description = "A list of subnet IDs to attach to the LB."
   default     = []
 }
 
 variable "alb_security_groups" {
-  type        = "list"
+  type        = list(string)
   description = "A list of security group IDs to assign to the LB."
   default     = []
 }
@@ -150,3 +150,4 @@ variable "scale_in_threshold" {
   description = "The value against which the specified statistic is compared for scaling in alarm."
   default     = 15
 }
+

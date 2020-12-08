@@ -1,16 +1,16 @@
 module "iam" {
   source = "./modules/iam"
 
-  instance_role_name       = "${var.instance_role_name}"
-  skip_instance_role       = "${var.skip_instance_role}"
-  load_balancing_role_name = "${var.load_balancing_role_name}"
-  skip_load_balancing_role = "${var.skip_load_balancing_role}"
-  autoscale_role_name      = "${var.autoscale_role_name}"
-  skip_autoscale_role      = "${var.skip_autoscale_role}"
+  instance_role_name       = var.instance_role_name
+  skip_instance_role       = var.skip_instance_role
+  load_balancing_role_name = var.load_balancing_role_name
+  skip_load_balancing_role = var.skip_load_balancing_role
+  autoscale_role_name      = var.autoscale_role_name
+  skip_autoscale_role      = var.skip_autoscale_role
 }
 
 resource "aws_ecs_cluster" "default" {
-  name = "${var.cluster_name}"
+  name = var.cluster_name
 }
 
 data "aws_ami" "default" {
@@ -28,39 +28,39 @@ data "aws_ami" "default" {
 }
 
 resource "aws_key_pair" "default" {
-  count = "${var.key_file != "" ? 1 : 0}"
+  count = var.key_file != "" ? 1 : 0
 
-  key_name   = "${var.key_name}"
-  public_key = "${file(var.key_file)}"
+  key_name   = var.key_name
+  public_key = file(var.key_file)
 }
 
 resource "aws_launch_configuration" "default" {
   # only create new launch configuration if a name is not configured
-  count = "${var.launch_configuration == "" ? 1 : 0}"
+  count = var.launch_configuration == "" ? 1 : 0
 
   # let terraform to generate name, to avoid problems during re-create
-  name_prefix          = "${var.cluster_name}"
-  image_id             = "${var.image_id != "" ? var.image_id : data.aws_ami.default.id}"
-  instance_type        = "${var.instance_type}"
-  iam_instance_profile = "${module.iam.instance_profile_name}"
-  key_name             = "${var.key_name}"
-  security_groups      = ["${var.security_groups}"]
+  name_prefix          = var.cluster_name
+  image_id             = var.image_id != "" ? var.image_id : data.aws_ami.default.id
+  instance_type        = var.instance_type
+  iam_instance_profile = module.iam.instance_profile_name
+  key_name             = var.key_name
+  security_groups      = var.security_groups
   user_data            = "#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.default.name} > /etc/ecs/ecs.config"
-  enable_monitoring    = "${var.enable_monitoring}"
-  ebs_optimized        = "${var.ebs_optimized}"
-  spot_price           = "${var.spot_price}"
-  placement_tenancy    = "${var.placement_tenancy}"
+  enable_monitoring    = var.enable_monitoring
+  ebs_optimized        = var.ebs_optimized
+  spot_price           = var.spot_price
+  placement_tenancy    = var.placement_tenancy
 
-  root_block_device = {
+  root_block_device {
     volume_type = "gp2"
-    volume_size = "${var.root_volume_size}"
+    volume_size = var.root_volume_size
   }
 
   # used for docker images, container volumes etc.
-  ebs_block_device = {
+  ebs_block_device {
     device_name = "/dev/xvdcz"
     volume_type = "gp2"
-    volume_size = "${var.block_device_size}"
+    volume_size = var.block_device_size
   }
 
   lifecycle {
@@ -69,17 +69,20 @@ resource "aws_launch_configuration" "default" {
 }
 
 resource "aws_autoscaling_group" "default" {
-  name_prefix          = "${var.cluster_name}"
-  launch_configuration = "${coalesce(var.launch_configuration, join("", aws_launch_configuration.default.*.name))}"
-  enabled_metrics      = ["${var.metrics}"]
+  name_prefix = var.cluster_name
+  launch_configuration = coalesce(
+    var.launch_configuration,
+    join("", aws_launch_configuration.default.*.name),
+  )
+  enabled_metrics = var.metrics
 
-  max_size                  = "${var.max_size}"
-  min_size                  = "${var.min_size}"
-  desired_capacity          = "${var.desired_capacity}"
-  wait_for_capacity_timeout = "${var.wait_for_capacity_timeout}"
+  max_size                  = var.max_size
+  min_size                  = var.min_size
+  desired_capacity          = var.desired_capacity
+  wait_for_capacity_timeout = var.wait_for_capacity_timeout
 
-  availability_zones  = ["${var.vpc_azs}"]
-  vpc_zone_identifier = ["${var.vpc_subnets}"]
+  availability_zones  = var.vpc_azs
+  vpc_zone_identifier = var.vpc_subnets
 
   tags = [
     {
@@ -89,7 +92,7 @@ resource "aws_autoscaling_group" "default" {
     },
     {
       key                 = "Cluster"
-      value               = "${var.cluster_name}"
+      value               = var.cluster_name
       propagate_at_launch = "true"
     },
   ]
@@ -98,12 +101,16 @@ resource "aws_autoscaling_group" "default" {
     create_before_destroy = true
   }
 
-  count = "${var.autoscaling_group == "" ? 1 : 0}"
+  count = var.autoscaling_group == "" ? 1 : 0
 }
 
 module "scaling" {
-  enable                 = "${var.autoscale}"
-  source                 = "./modules/scaling"
-  cluster_name           = "${aws_ecs_cluster.default.name}"
-  autoscaling_group_name = "${coalesce(var.autoscaling_group, join("", aws_autoscaling_group.default.*.name))}"
+  enable       = var.autoscale
+  source       = "./modules/scaling"
+  cluster_name = aws_ecs_cluster.default.name
+  autoscaling_group_name = coalesce(
+    var.autoscaling_group,
+    join("", aws_autoscaling_group.default.*.name),
+  )
 }
+

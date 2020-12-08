@@ -27,3 +27,4 @@ variable "skip_autoscale_role" {
   description = "Skip creation of IAM role associated with auto scaled service."
   default     = false
 }
+

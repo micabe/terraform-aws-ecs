@@ -16,43 +16,43 @@ variable "memory" {
 }
 
 variable "env_vars" {
-  type        = "list"
+  type        = list(string)
   description = "The environment variables to pass to a container."
   default     = []
 }
 
 variable "entry_point" {
-  type        = "list"
+  type        = list(string)
   description = "The entry point that is passed to the container."
   default     = []
 }
 
 variable "command" {
-  type        = "list"
+  type        = list(string)
   description = "The command that is passed to the container."
   default     = []
 }
 
 variable "port_mappings" {
-  type        = "list"
+  type        = list(string)
   description = "Port mappings allow containers to access ports on the host container instance to send or receive traffic."
   default     = []
 }
 
 variable "links" {
-  type        = "list"
+  type        = list(string)
   description = "The link parameter allows containers to communicate with each other without the need for port mappings."
   default     = []
 }
 
 variable "mount_points" {
-  type        = "list"
+  type        = list(string)
   description = "The mount points for data volumes in your container. "
   default     = []
 }
 
 variable "volumes_from" {
-  type        = "list"
+  type        = list(string)
   description = "Data volumes to mount from another container."
   default     = []
 }
@@ -61,3 +61,4 @@ variable "task_role_arn" {
   description = "IAM role that allows the containers in the task permission to call the AWS API"
   default     = ""
 }
+
