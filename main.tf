@@ -15,6 +15,7 @@ resource "aws_ecs_cluster" "default" {
 
 data "aws_ami" "default" {
   most_recent = true
+  owners = ["amazon"]
 
   filter {
     name   = "name"
@@ -81,7 +82,7 @@ resource "aws_autoscaling_group" "default" {
   desired_capacity          = var.desired_capacity
   wait_for_capacity_timeout = var.wait_for_capacity_timeout
 
-  availability_zones  = var.vpc_azs
+  availability_zones  = var.vpc_azs[count.index]
   vpc_zone_identifier = var.vpc_subnets
 
   tags = [

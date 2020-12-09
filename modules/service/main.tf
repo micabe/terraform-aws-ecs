@@ -4,17 +4,18 @@ data "aws_ecs_cluster" "default" {
 
 data "aws_iam_role" "default" {
   name  = var.service_role
-  count = var.service_role ? 0 : 1
+  count = var.service_role == "" ? 0 : 1
 }
 
 resource "aws_ecs_service" "default" {
-  count = var.has_load_balancer ? 0 : 1
+  count = var.has_load_balancer == "" ? 0 : 1
 
   name            = var.name
   cluster         = data.aws_ecs_cluster.default.id
   task_definition = var.task_definition
   desired_count   = var.desired_count
-  iam_role        = coalesce(var.service_role, join("", data.aws_iam_role.default.*.arn))
+  # iam_role        = var.service_role == "" ? "" : .arn
+  # iam_role        = coalesce(var.service_role, join("", data.aws_iam_role.default.*.arn))
 
   deployment_maximum_percent         = var.max_healthy_percent
   deployment_minimum_healthy_percent = var.min_healthy_percent

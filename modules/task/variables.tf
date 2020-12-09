@@ -16,7 +16,7 @@ variable "memory" {
 }
 
 variable "env_vars" {
-  type        = list(string)
+  type        = list(map(string))
   description = "The environment variables to pass to a container."
   default     = []
 }
@@ -34,7 +34,7 @@ variable "command" {
 }
 
 variable "port_mappings" {
-  type        = list(string)
+  type        = list(map(string))
   description = "Port mappings allow containers to access ports on the host container instance to send or receive traffic."
   default     = []
 }

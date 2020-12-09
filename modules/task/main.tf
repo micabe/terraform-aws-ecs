@@ -4,7 +4,7 @@ locals {
 }
 
 data "template_file" "default" {
-  template = file("${path.module}/task.json")
+  template = file("${path.module}/task.tpl")
 
   vars = {
     name             = var.name

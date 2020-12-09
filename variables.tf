@@ -58,7 +58,7 @@ variable "instance_type" {
 }
 
 variable "security_groups" {
-  type        = list(string)
+  type        = list
   description = "A list of associated security group IDS."
   default     = []
 }
@@ -124,19 +124,19 @@ variable "wait_for_capacity_timeout" {
 }
 
 variable "vpc_azs" {
-  type        = list(string)
+  type        = list
   description = "A list of AZs to launch resources in default VPC. Required only if you do not specify any vpc_subnets."
   default     = []
 }
 
 variable "vpc_subnets" {
-  type        = list(string)
+  type        = list
   description = "A list of subnet IDs to launch resources in."
   default     = []
 }
 
 variable "metrics" {
-  type        = list(string)
+  type        = list
   description = "A list of metrics to collect. Supported metrics: GroupMinSize, GroupMaxSize, GroupDesiredCapacity, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupTerminatingInstances, GroupTotalInstances."
 
   default = []
